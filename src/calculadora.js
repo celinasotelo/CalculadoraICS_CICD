@@ -1,3 +1,5 @@
+const resultado = 10;
+
 function calcularPromedio(parcial1, parcial2, parcial3) {
   const notas = [parcial1, parcial2, parcial3];
 
