@@ -104,34 +104,34 @@ ics-grade-calculator/
 ├── src/
 │   └── calculadora.js        # Función pura calcularPromedio()
 ├── tests/
-│   └── calculadora.test.js   # Tests unitarios (TC-01 a TC-10, TV-01 a TV-06)
+│   └── calculadora.test.js   # Tests unitarios 
+├── .github
+│   └── workflows
+│     └── test.yaml           # Pipeline
+├── .eslintrc.js              # Configuración de ESLint
+├── Dockerfile                # Contenedor
 ├── package.json
-├── Dockerfile
-└── requirements.md           # Este archivo — fuente de verdad
+└── requirements.md           # Fuente de verdad
 ```
 
 ---
 
-## 6. Stack Tecnológico — Fase actual
+## 6. Stack Tecnológico 
 
 | Componente  | Tecnología       |
 |-------------|------------------|
 | Runtime     | Node.js (≥ 18)   |
 | Testing     | Jest             |
+| Linter      | ESLint           |
 
 ---
 
-## 7. Roadmap de Fases
+## 7. Criterios del Pipeline de Github Actions
 
-El proyecto crece fase a fase. Cada fase tiene su propia sección en este documento
-**antes** de ser implementada.
+El pipeline corre en este orden. Si un paso falla, los siguientes no se ejecutan:
 
-| Fase | Contenido                                      | Estado     |
-|------|------------------------------------------------|------------|
-| 1    | Función pura + tests unitarios                 | ✅ Actual  |
-| 2    | Lint (ESLint)                                  | 🔲 Próxima |
-| 3    | Docker                                         | 🔲 Futura  |
-| 4    | CI con GitHub Actions                          | 🔲 Futura  |
-| 5    | Deploy en Render                               | 🔲 Futura  |
-
----
+push a main
+    ↓
+npm run lint     ← falla rápido si hay errores de estilo
+    ↓
+npm test         ← valida las reglas de negocio
