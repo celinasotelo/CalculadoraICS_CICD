@@ -9,10 +9,10 @@
   ],
   "parserOptions": {
     "ecmaVersion": 12,
-    "sourceType": "module"
+    "sourceType": "commonjs"
   },
-  "rules": {
-    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
-    "no-console": "off"
-  }
+    "rules": {
+    "no-unused-vars": ["error", { "vars": "all", "args": "all" }],
+    "no-unused-expressions": "error"
+    }
 }
