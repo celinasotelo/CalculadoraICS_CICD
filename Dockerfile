@@ -2,10 +2,9 @@ FROM node:18
 
 WORKDIR /app
 
-COPY package.json /app/
+COPY package.json package-lock.json /app/
 RUN npm install
 
-COPY src/ /app/src/
-COPY tests/ /app/tests/
+COPY . /app/
 
-CMD ["npm", "test"]
+CMD ["sh", "-c", "npm run lint && npm test"]

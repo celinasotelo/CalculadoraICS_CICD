@@ -5,9 +5,14 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Check out repository
@@ -26,3 +31,6 @@ jobs:
 
       - name: Run tests
         run: npm test
+
+      - name: Build Docker
+        run: docker build -t calculadora-ics .

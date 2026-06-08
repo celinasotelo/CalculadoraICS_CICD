@@ -122,7 +122,9 @@ ics-grade-calculator/
 |-------------|------------------|
 | Runtime     | Node.js (≥ 18)   |
 | Testing     | Jest             |
+| CI/CD       | Github Actions   |
 | Linter      | ESLint           |
+| Contenedor  | Docker           |
 
 ---
 
@@ -135,3 +137,5 @@ push a main
 npm run lint     ← falla rápido si hay errores de estilo
     ↓
 npm test         ← valida las reglas de negocio
+    ↓
+docker build     ← construye la imagen
