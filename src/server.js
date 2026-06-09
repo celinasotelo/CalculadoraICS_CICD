@@ -1,8 +1,13 @@
+const path = require('path');
 const express = require('express');
 const { calcularPromedio } = require('./calculadora');
 
 const app = express();
 app.use(express.json());
+
+app.get('/', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
