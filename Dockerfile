@@ -7,4 +7,4 @@ RUN npm install
 
 COPY . /app/
 
-CMD ["sh", "-c", "npm run lint && npm test"]
+CMD ["sh", "-c", "npm run lint && npm test && tail -f /dev/null"]
