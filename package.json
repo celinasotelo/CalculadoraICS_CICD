@@ -4,8 +4,12 @@
   "description": "Calculadora de promedio para Ingeniería y Calidad de Software",
   "private": true,
   "scripts": {
+    "start": "node src/server.js",
     "test": "jest",
     "lint": "eslint ."
+  },
+  "dependencies": {
+    "express": "^4.18.2"
   },
   "devDependencies": {
     "eslint": "^8.57.0",

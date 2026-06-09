@@ -7,4 +7,6 @@ RUN npm install
 
 COPY . /app/
 
-CMD ["sh", "-c", "npm run lint && npm test && tail -f /dev/null"]
+EXPOSE 3000
+
+CMD ["node", "src/server.js"]

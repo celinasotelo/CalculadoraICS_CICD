@@ -34,3 +34,12 @@ jobs:
 
       - name: Build Docker
         run: docker build -t calculadora-ics .
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Deploy to Render
+        run: |
+          curl --fail -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
