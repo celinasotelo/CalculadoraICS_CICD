@@ -61,7 +61,7 @@ La función **lanza una excepción** (`throw new Error(...)`). No devuelve un ob
 | Situación                  | Mensaje del error                        | Regla  |
 |----------------------------|------------------------------------------|--------|
 | Alguna nota no es número   | `"Las notas deben ser números"`          | RN-07  |
-| Alguna nota fuera de rango | `"Las notas deben estar entre 0 y 10"`  | RN-08  |
+| Alguna nota fuera de rango | `"Las notas deben estar entre 0 y 10"`   | RN-08  |
 
 ---
 
@@ -102,7 +102,9 @@ Estos casos deben existir como tests **antes** de la implementación.
 ```
 ics-grade-calculator/
 ├── src/
-│   └── calculadora.js        # Función pura calcularPromedio()
+│   ├── calculadora.js        # Función pura calcularPromedio()
+│   ├── index.html 
+│   └── server.js
 ├── tests/
 │   └── calculadora.test.js   # Tests unitarios 
 ├── .github
@@ -120,7 +122,7 @@ ics-grade-calculator/
 
 | Componente  | Tecnología       |
 |-------------|------------------|
-| Runtime     | Node.js (≥ 18)   |
+| Runtime     | Node.js (≥ 22)   |
 | Testing     | Jest             |
 | CI/CD       | Github Actions   |
 | Linter      | ESLint           |
