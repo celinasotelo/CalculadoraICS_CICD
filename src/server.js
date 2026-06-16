@@ -1,6 +1,6 @@
-import path from 'path';
-import express from 'express';
-import { calcularPromedio } from './calculadora.js';
+const path = require('path');
+const express = require('express');
+const { calcularPromedio } = require('./calculadora');
 
 const app = express();
 app.use(express.json());

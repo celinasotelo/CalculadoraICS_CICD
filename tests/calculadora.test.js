@@ -1,4 +1,4 @@
-import { calcularPromedio } from '../src/calculadora.js';
+const { calcularPromedio } = require('../src/calculadora');
 
 describe('calcularPromedio', () => {
   test('TC-01: 7, 8, 9 => promedio 8, aprobado true', () => {

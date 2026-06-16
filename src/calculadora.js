@@ -18,4 +18,4 @@ function calcularPromedio(parcial1, parcial2, parcial3) {
   };
 }
 
-export { calcularPromedio };
+module.exports = { calcularPromedio };
