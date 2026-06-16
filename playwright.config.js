@@ -14,7 +14,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
 
   // Concise 'dot' for CI, default 'list' when running locally
-  reporter: process.env.CI ? 'dot' : 'list',
+  reporter: process.env.CI ? ['dot', ['html', { open: 'never' }]] : 'list',
 
   use: {
     baseURL: process.env.CI
