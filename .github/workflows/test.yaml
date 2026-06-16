@@ -2,34 +2,34 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 permissions:
   contents: read
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Use Node.js 22.x
         uses: actions/setup-node@v4.4.0
         with:
-          node-version: 18
+          node-version: '22.x'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Run ESLint
+      - name: Lint ESLint
         run: npm run lint
 
-      - name: Run tests
+      - name: Test unitarios
         run: npm test
 
       - name: Build Docker
@@ -37,8 +37,11 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: test
+    needs: build
+    if: github.event_name == 'push'
 
     steps:
       - name: Deploy to Render
-        run: curl -X POST "https://api.render.com/deploy/srv-d8jqjlgg4nts73clfvkg?key=_851QCZEJ_E"
+        run: curl -X POST "$RENDER_DEPLOY_HOOK_URL"
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
