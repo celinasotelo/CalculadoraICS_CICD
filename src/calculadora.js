@@ -1,4 +1,4 @@
-// Calcula el promedio de tres parciales y determina si el alumno aprueba (todas las notas >= 6)
+// Calcula el promedio de tres parciales y determina 
 function calcularPromedio(parcial1, parcial2, parcial3) {
   const notas = [parcial1, parcial2, parcial3];
 
