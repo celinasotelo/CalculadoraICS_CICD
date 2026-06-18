@@ -99,22 +99,44 @@ jobs:
     if: always()
 
     steps:
-      - name: Enviar notificacion a Discord
+      - name: Notificar a Discord
         run: |
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          COMMIT_URL="${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"
+          SHORT_SHA="${{ github.sha }}"
+          SHORT_SHA="${SHORT_SHA:0:7}"
 
           if [ "${{ needs.build.result }}" = "failure" ]; then
-            MSG="Pipeline fallido | Job: build | Paso: ${{ needs.build.outputs.failed_step }} | $RUN_URL"
+            COLOR=15158332
+            TITLE="Pipeline fallido"
+            FAILED_FIELD=",{\"name\":\"Job fallido\",\"value\":\"build\",\"inline\":true},{\"name\":\"Paso\",\"value\":\"${{ needs.build.outputs.failed_step }}\",\"inline\":true}"
           elif [ "${{ needs.deploy.result }}" = "failure" ]; then
-            MSG="Pipeline fallido | Job: deploy | $RUN_URL"
+            COLOR=15158332
+            TITLE="Pipeline fallido"
+            FAILED_FIELD=",{\"name\":\"Job fallido\",\"value\":\"deploy\",\"inline\":true}"
           elif [ "${{ needs.e2e.result }}" = "failure" ]; then
-            MSG="Pipeline fallido | Job: e2e (tests Playwright) | $RUN_URL"
+            COLOR=15158332
+            TITLE="Pipeline fallido"
+            FAILED_FIELD=",{\"name\":\"Job fallido\",\"value\":\"e2e\",\"inline\":true},{\"name\":\"Paso\",\"value\":\"Run Playwright tests\",\"inline\":true}"
           else
-            MSG="Pipeline exitoso | $RUN_URL"
+            COLOR=3066993
+            TITLE="Pipeline exitoso"
+            FAILED_FIELD=""
           fi
 
           curl -s -X POST "$DISCORD_WEBHOOK_URL" \
             -H "Content-Type: application/json" \
-            -d "{\"content\": \"$MSG\"}"
+            -d "{\"embeds\":[{
+              \"title\":\"$TITLE\",
+              \"color\":$COLOR,
+              \"fields\":[
+                {\"name\":\"Repositorio\",\"value\":\"${{ github.repository }}\",\"inline\":true},
+                {\"name\":\"Rama\",\"value\":\"${{ github.ref_name }}\",\"inline\":true},
+                {\"name\":\"Autor\",\"value\":\"${{ github.actor }}\",\"inline\":true},
+                {\"name\":\"Commit\",\"value\":\"[$SHORT_SHA]($COMMIT_URL)\",\"inline\":true}
+                $FAILED_FIELD
+              ],
+              \"footer\":{\"text\":\"Ver pipeline: $RUN_URL\"}
+            }]}"
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
