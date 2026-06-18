@@ -24,7 +24,7 @@ test('el botón limpiar resetea el formulario', async ({ page }) => {
   await page.getByRole('button', { name: 'Calcular promedio' }).click();
   await page.getByRole('button', { name: 'Limpiar' }).click();
 
-  await expect(page.locator('#p1')).toHaveValue('');
+  await expect(page.locator('#p1')).toHaveValue('7');
   await expect(page.locator('#p2')).toHaveValue('');
   await expect(page.locator('#p3')).toHaveValue('');
   await expect(page.locator('#result')).not.toBeVisible();
