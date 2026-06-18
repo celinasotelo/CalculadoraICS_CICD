@@ -1,0 +1,120 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      failed_step: ${{ steps.check.outputs.failed_step }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4.4.0
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        id: install
+        run: npm ci
+
+      - name: Lint ESLint
+        id: lint
+        run: npm run lint
+
+      - name: Test unitarios
+        id: unit-test
+        run: npm test
+
+      - name: Build Docker
+        id: docker
+        run: docker build -t calculadora-ics .
+
+      - name: Detectar paso fallido
+        id: check
+        if: failure()
+        run: |
+          if [ "${{ steps.install.outcome }}" = "failure" ]; then
+            echo "failed_step=Install dependencies" >> $GITHUB_OUTPUT
+          elif [ "${{ steps.lint.outcome }}" = "failure" ]; then
+            echo "failed_step=Lint ESLint" >> $GITHUB_OUTPUT
+          elif [ "${{ steps.unit-test.outcome }}" = "failure" ]; then
+            echo "failed_step=Test unitarios" >> $GITHUB_OUTPUT
+          elif [ "${{ steps.docker.outcome }}" = "failure" ]; then
+            echo "failed_step=Build Docker" >> $GITHUB_OUTPUT
+          fi
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Deploy to Render
+        run: curl -X POST "$RENDER_DEPLOY_HOOK_URL"
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        run: npx playwright test
+
+  notify-discord:
+    runs-on: ubuntu-latest
+    needs: [build, deploy, e2e]
+    if: always()
+
+    steps:
+      - name: Enviar notificacion a Discord
+        run: |
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          if [ "${{ needs.build.result }}" = "failure" ]; then
+            MSG="Pipeline fallido | Job: build | Paso: ${{ needs.build.outputs.failed_step }} | $RUN_URL"
+          elif [ "${{ needs.deploy.result }}" = "failure" ]; then
+            MSG="Pipeline fallido | Job: deploy | $RUN_URL"
+          elif [ "${{ needs.e2e.result }}" = "failure" ]; then
+            MSG="Pipeline fallido | Job: e2e (tests Playwright) | $RUN_URL"
+          else
+            MSG="Pipeline exitoso | $RUN_URL"
+          fi
+
+          curl -s -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "{\"content\": \"$MSG\"}"
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
