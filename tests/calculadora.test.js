@@ -6,7 +6,7 @@ describe('calcularPromedio', () => {
   });
 
   test('TC-02: 6, 6, 6 => promedio 6, aprobado true', () => {
-    expect(calcularPromedio(6, 6, 6)).toEqual({ promedio: 5, aprobado: true });
+    expect(calcularPromedio(6, 6, 6)).toEqual({ promedio: 6, aprobado: true });
   });
 
   test('TC-03: 5, 8, 9 => promedio 7, aprobado false', () => {
