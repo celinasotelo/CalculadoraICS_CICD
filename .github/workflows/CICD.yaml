@@ -106,15 +106,26 @@ jobs:
           SHORT_SHA="${{ github.sha }}"
           SHORT_SHA="${SHORT_SHA:0:7}"
 
-          if [ "${{ needs.build.result }}" = "failure" ]; then
+          BUILD="${{ needs.build.result }}"
+          DEPLOY="${{ needs.deploy.result }}"
+          E2E="${{ needs.e2e.result }}"
+
+          # Armar lista de jobs completados exitosamente
+          COMPLETED=""
+          [ "$BUILD" = "success" ] && COMPLETED="build"
+          [ "$DEPLOY" = "success" ] && COMPLETED="${COMPLETED:+$COMPLETED, }deploy"
+          [ "$E2E" = "success" ] && COMPLETED="${COMPLETED:+$COMPLETED, }e2e"
+          [ -z "$COMPLETED" ] && COMPLETED="ninguno"
+
+          if [ "$BUILD" = "failure" ]; then
             COLOR=15158332
             TITLE="Pipeline fallido"
             FAILED_FIELD=",{\"name\":\"Job fallido\",\"value\":\"build\",\"inline\":true},{\"name\":\"Paso\",\"value\":\"${{ needs.build.outputs.failed_step }}\",\"inline\":true}"
-          elif [ "${{ needs.deploy.result }}" = "failure" ]; then
+          elif [ "$DEPLOY" = "failure" ]; then
             COLOR=15158332
             TITLE="Pipeline fallido"
             FAILED_FIELD=",{\"name\":\"Job fallido\",\"value\":\"deploy\",\"inline\":true}"
-          elif [ "${{ needs.e2e.result }}" = "failure" ]; then
+          elif [ "$E2E" = "failure" ]; then
             COLOR=15158332
             TITLE="Pipeline fallido"
             FAILED_FIELD=",{\"name\":\"Job fallido\",\"value\":\"e2e\",\"inline\":true},{\"name\":\"Paso\",\"value\":\"Run Playwright tests\",\"inline\":true}"
@@ -131,9 +142,10 @@ jobs:
               \"color\":$COLOR,
               \"fields\":[
                 {\"name\":\"Repositorio\",\"value\":\"${{ github.repository }}\",\"inline\":true},
-                {\"name\":\"Rama\",\"value\":\"${{ github.ref_name }}\",\"inline\":true},
+                {\"name\":\"Rama\",\"value\":\"${{ github.head_ref || github.ref_name }}\",\"inline\":true},
                 {\"name\":\"Autor\",\"value\":\"${{ github.actor }}\",\"inline\":true},
-                {\"name\":\"Commit\",\"value\":\"[$SHORT_SHA]($COMMIT_URL)\",\"inline\":true}
+                {\"name\":\"Commit\",\"value\":\"[$SHORT_SHA]($COMMIT_URL)\",\"inline\":true},
+                {\"name\":\"Jobs completados\",\"value\":\"$COMPLETED\",\"inline\":false}
                 $FAILED_FIELD
               ],
               \"footer\":{\"text\":\"Ver pipeline: $RUN_URL\"}
